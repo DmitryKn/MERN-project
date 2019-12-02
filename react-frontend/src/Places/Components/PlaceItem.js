@@ -1,19 +1,17 @@
 import React, { useState } from "react";
+
 import Card from "../../Shared/Components/UIElements/Card";
 import Button from "../../Shared/Components/FromElements/Button";
 import Modal from "../../Shared/Components/UIElements/Modal";
+import Map from "../../Shared/Components/UIElements/Map";
 import "./PlaceItem.css";
 
 const PlaceItem = props => {
   const [showMap, setShowMap] = useState(false);
 
-  const openMapHandler = () => {
-    setShowMap(true);
-  };
+  const openMapHandler = () => setShowMap(true);
 
-  const closeMapHandler = () => {
-    setShowMap(false);
-  };
+  const closeMapHandler = () => setShowMap(false);
 
   return (
     <React.Fragment>
@@ -26,10 +24,9 @@ const PlaceItem = props => {
         footer={<Button onClick={closeMapHandler}>CLOSE</Button>}
       >
         <div className="map-container">
-          <h2>THE MAP!</h2>
+          <Map center={props.coordinates} zoom={16} />
         </div>
       </Modal>
-
       <li className="place-item">
         <Card className="place-item__content">
           <div className="place-item__image">
