@@ -5,6 +5,7 @@ import Users from "./Users/Pages/Users";
 import UserPlaces from "./Places/Pages/UserPlaces";
 import NewPlace from "./Places/Pages/NewPlace";
 import UpdatePlace from "./Places/Pages/UpdatePlace";
+import Authentication from "./Users/Pages/Auth";
 import { Route, Redirect, Switch } from "react-router-dom";
 
 const App = () => {
@@ -17,6 +18,7 @@ const App = () => {
           <Route exact path="/:userId/places" component={UserPlaces} />
           <Route exact path="/places/new" component={NewPlace} />
           <Route exact path="/places/:placeId" component={UpdatePlace} />
+          <Route exact path="/auth" component={Authentication} />
           <Redirect to="/" />
         </Switch>
       </main>
