@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Input from "../../Shared/Components/FromElements/Input";
 import Button from "../../Shared/Components/FromElements/Button";
 import Card from "../../Shared/Components/UIElements/Card";
 import { useForm } from "../../Shared/Hooks/Form-hooks";
+import { AuthContext } from "../../Shared/Context/auth-context";
 import {
   VALIDATOR_MINLENGTH,
   VALIDATOR_EMAIL,
@@ -12,7 +13,10 @@ import {
 import "./Auth.css";
 
 const Auth = () => {
+  const auth = useContext(AuthContext);
+
   const [isLoginMode, setIsLoginMode] = useState(true);
+
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -55,6 +59,7 @@ const Auth = () => {
   const authSubmitHandler = event => {
     event.preventDefault();
     console.log(formState.inputs);
+    auth.login();
   };
 
   return (
@@ -68,7 +73,7 @@ const Auth = () => {
             element="input"
             type="text"
             label="Your name"
-            validators={([VALIDATOR_REQUIRE()], VALIDATOR_MINLENGTH(4))} //checking if the input not an empty
+            validators={([VALIDATOR_REQUIRE()], VALIDATOR_MINLENGTH(4))} //checking if the input not empty
             errorText="Please enter a name."
             onInput={inputHandler}
           />
@@ -78,7 +83,7 @@ const Auth = () => {
           element="input"
           type="email"
           label="E-mail"
-          validators={[VALIDATOR_EMAIL()]} //checking if the input not an empty
+          validators={[VALIDATOR_EMAIL()]} //checking if the input not empty
           errorText="Please enter a valid email address."
           onInput={inputHandler}
         />
@@ -87,7 +92,7 @@ const Auth = () => {
           element="input"
           type="password"
           label="Password"
-          validators={[VALIDATOR_MINLENGTH(6)]} //checking if the input not an empty
+          validators={[VALIDATOR_MINLENGTH(6)]} //checking if the input not empty
           errorText="Please enter a valid password.(At least 5 characters.)"
           onInput={inputHandler}
         />

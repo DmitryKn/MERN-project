@@ -8,9 +8,16 @@ export const AuthContext = createContext({
 
 /*
   1) create Context
-  2) add {AuthContext} to App
-  3) wrap with <AuthContext.Provider value={}> all elements + it is good to use  {useState}
-  4) add {AuthContext} to component where need state + { useContext } for listening state
-    const auth = useContext(AuthContext);
+
+  Обветрка в Аpp
+  2) add {myContext} to App
+  3) wrap with <myContext.Provider value={}> all elements + {useState} + create functions to use
+
+  В компонентах где нам необходимо использовать стейт:
+  4) add { useContext } + {myContext}
+    const varName = useContext(myContext);
+
+    return
+    {varName.myProp && <button> }
 
   */
