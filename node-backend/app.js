@@ -1,17 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+
+const placesRoutes = require("./routes/places-routes");
+
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use("/api/places", placesRoutes);
 
-app.get("/", (req, res, next) => {
-  res.send(
-    '<form action="/user" method="POST"><input type="text" name="username"/><button type="submit">SUBMIT</button></form>'
-  );
+app.listen(5000, (req, res) => {
+  console.log("Server working");
 });
-
-app.post("/user", (req, res) => {
-  res.send("<h1>" + req.body.username + "</h1>");
-});
-
-app.listen(5000);

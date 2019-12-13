@@ -1,14 +1,16 @@
 # MERN-project.
 
-Frontend: React
-Backend: Node.js + Express + Mongo DB
+> Frontend: HTML, CSS, React.js
+> Backend: Node.js, Express, Mongo_DB
 
 ## To start project:
 
-in frontend folder:
+in react-frontend folder:
 
-> "npm i", "npm start".
+> "npm i"
+> "npm start".
 
-in backend folder:
+in node-backend folder:
 
-> "npm i", "npm start".
+> "npm i"
+> "npm start".
