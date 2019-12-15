@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const HttpError = require("./models/http-error");
 
 const placesRoutes = require("./routes/places-routes");
 
@@ -7,6 +8,11 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use("/api/places", placesRoutes);
+app.use((req, res) => {
+  //middware for wrong routes
+  const error = new HttpError("Could not find this route", 404);
+  throw error;
+});
 
 //special middleware for error handling
 app.use((error, req, res, next) => {
