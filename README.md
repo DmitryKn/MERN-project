@@ -1,7 +1,12 @@
 # MERN-project.
 
-> Frontend: HTML, CSS, React.js
-> Backend: Node.js, Express, Mongo_DB
+Frontend:
+
+> HTML, CSS, React.js
+
+Backend:
+
+> Node.js, Express, Mongo_DB
 
 ## To start project:
 
