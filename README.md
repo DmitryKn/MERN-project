@@ -1,4 +1,4 @@
-# MERN-project.
+# MERN-project(Mongo, Express, React, Node).
 
 Frontend:
 
