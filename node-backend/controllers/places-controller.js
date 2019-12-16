@@ -28,15 +28,15 @@ const getPlaceById = (req, res, next) => {
   }
 };
 
-const getPlaceByUserId = (req, res) => {
+const getPlacesByUserId = (req, res) => {
   const userId = req.params.uid;
   const listOfPlacesByUser = DUMMY_PLACES.filter(u => {
     return u.creator === userId;
   });
 
-  if (listOfPlacesByUser.length === 0) {
+  if (!listOfPlacesByUser || listOfPlacesByUser.length === 0) {
     throw new HttpError(
-      "Could not find the place for the provided user id",
+      "Could not find the places for the provided user id",
       404
     );
   } else {
@@ -63,7 +63,7 @@ const updatePlace = (req, res) => {
   const { title, description } = req.body;
   const placeId = req.params.pid;
   const updatedPlace = { ...DUMMY_PLACES.find(p => p.id === placeId) }; //creating copy for changes
-  const placeIndex = DUMMY_PLACES.indexOf(p => p.id === placeId);
+  const placeIndex = DUMMY_PLACES.findIndex(p => p.id === placeId);
 
   updatedPlace.title = title;
   updatedPlace.description = description;
@@ -81,7 +81,7 @@ const deletePlace = (req, res) => {
 };
 
 exports.getPlaceById = getPlaceById;
-exports.getPlaceByUserId = getPlaceByUserId;
+exports.getPlacesByUserId = getPlacesByUserId;
 exports.createPlace = createPlace;
 exports.updatePlace = updatePlace;
 exports.deletePlace = deletePlace;
