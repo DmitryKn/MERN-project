@@ -1,6 +1,7 @@
 const HttpError = require("../models/http-error");
 const uuid = require("uuid/v4");
 const { validationResult } = require("express-validator");
+const getCoordinates = require("../util/location");
 
 let DUMMY_PLACES = [
   {
@@ -45,18 +46,28 @@ const getPlacesByUserId = (req, res) => {
   }
 };
 
-const createPlace = (req, res) => {
+const createPlace = async (req, res, next) => {
   const error = validationResult(req); // express-validator middlware check
   if (!error.isEmpty()) {
-    throw new HttpError("Invalid inputs passed. Please check your data.", 422);
+    return next(
+      new HttpError("Invalid inputs passed. Please check your data.", 422)
+    );
   }
 
-  const { title, description, coordinates, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
+
+  let coordinates; //using google api midddleware address => coordinates
+  try {
+    coordinates = await getCoordinates(address);
+  } catch (error) {
+    return next(error);
+  }
+
   const createdPlace = {
     id: uuid(),
     title,
     description,
-    location: coordinates,
+    location: coordinates, //google coordinates
     address,
     creator
   };
