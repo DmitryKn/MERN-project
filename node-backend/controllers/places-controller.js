@@ -59,6 +59,7 @@ const getPlacesByUserId = async (req, res) => {
   } else {
     res.json({
       places: listOfPlacesByUser.map(p => p.toObject({ getters: true }))
+      //converting mongoose object => js object
     });
   }
 };
@@ -101,7 +102,7 @@ const createPlace = async (req, res, next) => {
   res.status(201).json({ place: createdPlace }); // if object successfuly created - 201
 };
 
-const updatePlace = (req, res) => {
+const updatePlace = async (req, res, next) => {
   const error = validationResult(req); // express-validator middlware check
   if (!error.isEmpty()) {
     throw new HttpError("Invalid inputs passed. Please check your data.", 422);
@@ -109,25 +110,47 @@ const updatePlace = (req, res) => {
 
   const { title, description } = req.body;
   const placeId = req.params.pid;
-  const updatedPlace = { ...DUMMY_PLACES.find(p => p.id === placeId) }; //creating copy for changes
-  const placeIndex = DUMMY_PLACES.findIndex(p => p.id === placeId);
+
+  let updatedPlace;
+  try {
+    updatedPlace = await Place.findById(placeId);
+  } catch (err) {
+    const error = new HttpError("Could not update place", 500);
+    return next(error);
+  }
 
   updatedPlace.title = title;
   updatedPlace.description = description;
 
-  DUMMY_PLACES[placeIndex] = updatedPlace; // change copy
+  try {
+    await updatedPlace.save();
+  } catch (err) {
+    const error = new HttpError("Could not update place", 500);
+    return next(error);
+  }
 
-  res.status(200).json({ place: updatedPlace });
+  res.status(200).json({ place: updatedPlace.toObject({ getters: true }) });
 };
 
-const deletePlace = (req, res) => {
+const deletePlace = async (req, res) => {
   const placeId = req.params.pid;
-  if (!DUMMY_PLACES.find(p => p.id === placeId)) {
-    throw new HttpError("Could not find a place for that id.", 404);
-  }
-  DUMMY_PLACES = DUMMY_PLACES.filter(p => p.id !== placeId);
 
-  res.status(200).json({ message: "Deleted place" });
+  let place;
+  try {
+    place = await Place.findById(placeId); //find object in db
+  } catch (err) {
+    const error = new HttpError("Could not delete place", 500);
+    return next(error);
+  }
+
+  try {
+    await place.remove(placeId); //delete object in db
+  } catch (err) {
+    const error = new HttpError("Could not delete place", 500);
+    return next(error);
+  }
+
+  res.status(200).json({ message: "Place deleted successfully" });
 };
 
 exports.getPlaceById = getPlaceById;
