@@ -32,7 +32,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    "mongodb+srv://Dimko:XDQ4LErWsh3qCGXz@cluster0-volzv.mongodb.net/places?retryWrites=true&w=majority"
+    "mongodb+srv://Dimko:XDQ4LErWsh3qCGXz@cluster0-volzv.mongodb.net/places_db?retryWrites=true&w=majority"
   )
   .then(() => {
     app.listen(5000, console.log("Server running port:5000"));

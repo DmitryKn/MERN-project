@@ -2,6 +2,7 @@ const HttpError = require("../models/http-error");
 const uuid = require("uuid/v4");
 const { validationResult } = require("express-validator");
 const getCoordinates = require("../util/location");
+const Place = require("../models/placeSchema"); //Place mongoose Schema
 
 let DUMMY_PLACES = [
   {
@@ -17,24 +18,38 @@ let DUMMY_PLACES = [
   }
 ];
 
-const getPlaceById = (req, res, next) => {
+const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
-  const specificPlace = DUMMY_PLACES.find(p => {
-    return p.id === placeId;
-  });
+  let specificPlace;
+  try {
+    specificPlace = await Place.findById(placeId); //mongoose find method
+  } catch (err) {
+    const error = new HttpError("Could not find a place", 500);
+    return next(error);
+  }
+
   if (!specificPlace) {
     //create an error according by error middleware + error class
-    throw new HttpError("Could not find the place for the provided id", 404);
+    const error = new HttpError(
+      "Could not find the place for the provided id",
+      404
+    );
+    return next(error);
   } else {
-    res.json({ place: specificPlace });
+    res.json({ place: specificPlace.toObject({ getters: true }) });
   }
 };
 
-const getPlacesByUserId = (req, res) => {
+const getPlacesByUserId = async (req, res) => {
   const userId = req.params.uid;
-  const listOfPlacesByUser = DUMMY_PLACES.filter(u => {
-    return u.creator === userId;
-  });
+
+  let listOfPlacesByUser;
+  try {
+    listOfPlacesByUser = await Place.find({ creator: userId }); //mongoose find by prop. returns Array
+  } catch (err) {
+    const error = new HttpError("Fetching places failed", 500);
+    return next(error);
+  }
 
   if (!listOfPlacesByUser || listOfPlacesByUser.length === 0) {
     throw new HttpError(
@@ -42,7 +57,9 @@ const getPlacesByUserId = (req, res) => {
       404
     );
   } else {
-    res.json({ places: listOfPlacesByUser });
+    res.json({
+      places: listOfPlacesByUser.map(p => p.toObject({ getters: true }))
+    });
   }
 };
 
@@ -63,16 +80,24 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
-  const createdPlace = {
-    id: uuid(),
+  const createdPlace = new Place({
     title,
     description,
-    location: coordinates, //google coordinates
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Empire_State_Building_from_the_Top_of_the_Rock.jpg/220px-Empire_State_Building_from_the_Top_of_the_Rock.jpg",
     address,
+    location: coordinates,
     creator
-  };
+  });
 
-  DUMMY_PLACES.push(createdPlace);
+  try {
+    await createdPlace.save(); //save new object in mongodb
+    console.log("Object created and saved");
+  } catch (err) {
+    const error = new HttpError("Creating place failed", 500);
+    return next(error);
+  }
+
   res.status(201).json({ place: createdPlace }); // if object successfuly created - 201
 };
 
