@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const HttpError = require("./models/http-error");
+const mongoose = require("mongoose");
 
 const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-route");
@@ -12,7 +13,7 @@ app.use("/api/places", placesRoutes);
 app.use("/api/users", usersRoutes);
 
 app.use((req, res) => {
-  //middware for wrong routes
+  //middleware for the wrong routes
   const error = new HttpError("Could not find this route", 404);
   throw error;
 });
@@ -29,6 +30,13 @@ app.use((error, req, res, next) => {
   }
 });
 
-app.listen(5000, (req, res) => {
-  console.log("Server is working");
-});
+mongoose
+  .connect(
+    "mongodb+srv://Dimko:XDQ4LErWsh3qCGXz@cluster0-volzv.mongodb.net/places?retryWrites=true&w=majority"
+  )
+  .then(() => {
+    app.listen(5000, console.log("Server running port:5000"));
+  })
+  .catch(error => {
+    console.log("Something wrong", error);
+  });
