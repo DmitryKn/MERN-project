@@ -1,14 +1,17 @@
 const uuid = require("uuid/v4");
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
+const User = require("../models/userSchema");
 
-const DUMMY_USERS = [
-  { id: "u1", name: "Dimko", email: "test1@mail.com", password: "test1" },
-  { id: "u2", name: "Pimko", email: "test2@mail.com", password: "test2" }
-];
-
-const getUsers = (req, res) => {
-  res.json({ users: DUMMY_USERS });
+const getUsers = async (req, res, next) => {
+  let allUsers;
+  try {
+    allUsers = await User.find();
+  } catch (err) {
+    const error = new HttpError("Could not get user list", 500);
+    return nexr(error);
+  }
+  res.json({ users: allUsers.map(u => u.toObject({ getters: true })) });
 };
 
 const signup = (req, res) => {

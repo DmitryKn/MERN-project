@@ -1,22 +1,7 @@
 const HttpError = require("../models/http-error");
-const uuid = require("uuid/v4");
 const { validationResult } = require("express-validator");
 const getCoordinates = require("../util/location");
 const Place = require("../models/placeSchema"); //Place mongoose Schema
-
-let DUMMY_PLACES = [
-  {
-    id: "p1",
-    title: "Emp St Build",
-    description: "OPne",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516
-    },
-    address: "West 34th Street, New York, NY, USA",
-    creator: "u1"
-  }
-];
 
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
