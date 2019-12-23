@@ -1,4 +1,3 @@
-const uuid = require("uuid/v4");
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
 const User = require("../models/userSchema");
@@ -14,36 +13,59 @@ const getUsers = async (req, res, next) => {
   res.json({ users: allUsers.map(u => u.toObject({ getters: true })) });
 };
 
-const signup = (req, res) => {
+const signup = async (req, res, next) => {
   const error = validationResult(req); // express-validator middlware check
   if (!error.isEmpty()) {
-    throw new HttpError("Invalid inputs passed. Please check your data.", 422);
+    return next(
+      new HttpError("Invalid inputs passed. Please check your data.", 422)
+    );
   }
 
-  const { name, email, password } = req.body;
+  const { name, email, password, places } = req.body;
 
-  const hasUser = DUMMY_USERS.find(u => u.email === email);
-  if (hasUser) {
-    throw new HttpError("Could not create user, email already exists.", 422);
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError("Sign up failed.", 500);
+    return next(error);
   }
 
-  const createdUser = {
-    id: uuid(),
-    name: name,
-    email: email,
-    password: password
-  };
+  if (existingUser) {
+    const error = new HttpError(
+      "User exist already. Please login instead.",
+      422
+    );
+    return next(error);
+  }
 
-  DUMMY_USERS.push(createdUser);
-  res.status(201).json({ user: createdUser });
+  const createdUser = new User({
+    name,
+    email,
+    password,
+    image: "pic",
+    places
+  });
+  console.log(createdUser);
+  try {
+    await createdUser.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Signing up failed. Could not save new user in database",
+      500
+    );
+    return next(error);
+  }
+
+  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
-const login = (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   const identifiedUser = DUMMY_USERS.find(u => u.email === email);
   if (!identifiedUser || identifiedUser.password !== password) {
-    throw new HttpError("Could not identify user.", 401);
+    return next(new HttpError("Could not identify user.", 401));
   }
   res.json({ message: "Logged in" });
 };

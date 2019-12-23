@@ -37,9 +37,8 @@ const getPlacesByUserId = async (req, res) => {
   }
 
   if (!listOfPlacesByUser || listOfPlacesByUser.length === 0) {
-    throw new HttpError(
-      "Could not find the places for the provided user id",
-      404
+    return next(
+      new HttpError("Could not find the places for the provided user id", 404)
     );
   } else {
     res.json({
@@ -90,7 +89,9 @@ const createPlace = async (req, res, next) => {
 const updatePlace = async (req, res, next) => {
   const error = validationResult(req); // express-validator middlware check
   if (!error.isEmpty()) {
-    throw new HttpError("Invalid inputs passed. Please check your data.", 422);
+    return next(
+      new HttpError("Invalid inputs passed. Please check your data.", 422)
+    );
   }
 
   const { title, description } = req.body;
