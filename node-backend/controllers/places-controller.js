@@ -1,7 +1,9 @@
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
 const getCoordinates = require("../util/location");
+const mongoose = require("mongoose");
 const Place = require("../models/placeSchema"); //Place mongoose Schema
+const User = require("../models/userSchema");
 
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
@@ -75,9 +77,28 @@ const createPlace = async (req, res, next) => {
     creator
   });
 
+  let user;
   try {
-    await createdPlace.save(); //save new object in mongodb
-    console.log("Object created and saved");
+    user = await User.findById(creator); //checking if user id already in db
+  } catch (err) {
+    const error = new HttpError("Creating place failed", 500);
+    return next(error);
+  }
+
+  if (!user) {
+    const error = new HttpError("Could not find user for providede id", 404);
+    return next(error);
+  }
+
+  try {
+    //STARTING SESSION FOR DATA EXCHANGE between 'User' and 'Place' collections
+    //creating new place with unique id
+    const sess = await mongoose.startSession(); //1) start session
+    sess.startTransaction();
+    await createdPlace.save({ session: sess }); //2) save object
+    user.places.push(createdPlace); //mongoose magic push()
+    await user.save({ session: sess });
+    await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError("Creating place failed", 500);
     return next(error);

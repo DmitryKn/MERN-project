@@ -5,9 +5,9 @@ const User = require("../models/userSchema");
 const getUsers = async (req, res, next) => {
   let allUsers;
   try {
-    allUsers = await User.find();
+    allUsers = await User.find({}, "-password");
   } catch (err) {
-    const error = new HttpError("Could not get user list", 500);
+    const error = new HttpError("Fetching users failed", 500);
     return nexr(error);
   }
   res.json({ users: allUsers.map(u => u.toObject({ getters: true })) });
@@ -21,7 +21,7 @@ const signup = async (req, res, next) => {
     );
   }
 
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
   try {
@@ -44,7 +44,7 @@ const signup = async (req, res, next) => {
     email,
     password,
     image: "pic",
-    places
+    places: []
   });
 
   try {
