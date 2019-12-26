@@ -9,6 +9,17 @@ const usersRoutes = require("./routes/users-route");
 const app = express();
 app.use(bodyParser.json());
 
+//add some headers to solve a CORS problem
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); //allows any domain send requests
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+  next();
+});
+
 app.use("/api/places", placesRoutes);
 app.use("/api/users", usersRoutes);
 
