@@ -2,41 +2,30 @@ import React, { useEffect, useState } from "react";
 import UserList from "../Components/UsersList";
 import ErrorModal from "../../Shared/Components/UIElements/ErrorModal";
 import LoadingSpinner from "../../Shared/Components/UIElements/LoadingSpinner";
+import { useHttpClient } from "../../Shared/Hooks/http-hook";
 
 const Users = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
   const [loadedUsers, setLoadUsers] = useState();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   useEffect(() => {
     // can't ASYNC()=>{} up there
     // create self invoked function
-    const sendRequest = async () => {
-      setIsLoading(true);
+    const fetchUsers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/users/");
-        const responseData = await response.json();
-
-        if (!response.ok) {
-          throw new Error(responseData.message);
-        }
+        const responseData = await sendRequest(
+          "http://localhost:5000/api/users/"
+        );
 
         setLoadUsers(responseData.users);
-      } catch (err) {
-        setError(err.message);
-      }
-      setIsLoading(false);
+      } catch (err) {}
     };
-    sendRequest(); //invoke
-  }, []);
-
-  const errorHandler = () => {
-    setError(null);
-  };
+    fetchUsers(); //invoke
+  }, [sendRequest]); //sendRequest is a dependancy for update state
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={errorHandler} />
+      <ErrorModal error={error} onClear={clearError} />
       {isLoading && (
         <div className="center">
           <LoadingSpinner />
