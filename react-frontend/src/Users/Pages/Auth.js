@@ -4,6 +4,7 @@ import Button from "../../Shared/Components/FromElements/Button";
 import Card from "../../Shared/Components/UIElements/Card";
 import LoadingSpinner from "../../Shared/Components/UIElements/LoadingSpinner";
 import ErrorModal from "../../Shared/Components/UIElements/ErrorModal";
+import ImageUpload from "../../Shared/Components/FromElements/ImageUpload";
 import { useForm } from "../../Shared/Hooks/Form-hooks";
 import { AuthContext } from "../../Shared/Context/auth-context";
 import { useHttpClient } from "../../Shared/Hooks/http-hook";
@@ -40,7 +41,8 @@ const Auth = () => {
       setFormData(
         {
           ...formState.inputs,
-          name: undefined
+          name: undefined,
+          image: undefined //if we switch from signup to signin. Preview = undef
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -50,6 +52,10 @@ const Auth = () => {
           ...formState.inputs,
           name: {
             value: "",
+            isValid: false
+          },
+          image: {
+            value: null,
             isValid: false
           }
         },
@@ -61,6 +67,8 @@ const Auth = () => {
 
   const authSubmitHandler = async event => {
     event.preventDefault();
+
+    console.log(formState.inputs);
 
     if (isLoginMode) {
       try {
@@ -114,6 +122,9 @@ const Auth = () => {
               errorText="Please enter a name."
               onInput={inputHandler}
             />
+          )}
+          {!isLoginMode && ( //if we in signup mode
+            <ImageUpload center id="image" onInput={inputHandler} />
           )}
           <Input
             element="input"
