@@ -27,7 +27,7 @@ const getPlaceById = async (req, res, next) => {
   }
 };
 
-const getPlacesByUserId = async (req, res) => {
+const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
 
   let listOfPlacesByUser;
@@ -70,8 +70,7 @@ const createPlace = async (req, res, next) => {
   const createdPlace = new Place({
     title,
     description,
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Empire_State_Building_from_the_Top_of_the_Rock.jpg/220px-Empire_State_Building_from_the_Top_of_the_Rock.jpg",
+    image: req.file.path,
     address,
     location: coordinates,
     creator
