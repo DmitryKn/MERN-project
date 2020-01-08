@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const HttpError = require("./models/http-error");
@@ -8,6 +11,9 @@ const usersRoutes = require("./routes/users-route");
 
 const app = express();
 app.use(bodyParser.json());
+
+//middleware for user images
+app.use("/uploads/images/", express.static(path.join("uploads", "images")));
 
 //add some headers to solve a CORS problem
 app.use((req, res, next) => {
@@ -31,6 +37,13 @@ app.use((req, res) => {
 
 //special middleware for error handling
 app.use((error, req, res, next) => {
+  if (req.file) {
+    //delete pic from req, if signup was failed
+    fs.unlink(req.file.path, err => {
+      console.log(err);
+    });
+  }
+
   if (res.headerSent) {
     // if response already sended -> only error
     return next(error);
