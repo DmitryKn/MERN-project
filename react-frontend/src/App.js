@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 import MainNavigation from "./Shared/Components/Navigation/MainNavigation";
 import Users from "./Users/Pages/Users";
@@ -16,6 +16,7 @@ const App = () => {
   const login = useCallback((uid, token) => {
     setToken(token);
     setUserId(uid);
+    //save data in Local storage
     localStorage.setItem(
       "userData",
       JSON.stringify({
@@ -28,7 +29,16 @@ const App = () => {
   const logout = useCallback(() => {
     setToken(null);
     setUserId(null);
+    localStorage.removeItem("userData"); //remove token
   }, []);
+
+  //autologin. If some data in local storage, do login.
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("userData"));
+    if (storedData && storedData.token) {
+      login(storedData.userId, storedData.token);
+    }
+  }, [login]);
 
   let routes;
   if (token) {
