@@ -127,8 +127,8 @@ const updatePlace = async (req, res, next) => {
   }
 
   //Authorization. Update can only creator.
-  if (updatePlace.creator.toString() !== req.userData.userId) {
-    const error = new HttpError("You are not allowed to edit this place", 401);
+  if (updatedPlace.creator.toString() !== req.userData.userId) {
+    const error = new HttpError("You are not allowed to edit this place.", 401);
     return next(error);
   }
 
@@ -162,9 +162,9 @@ const deletePlace = async (req, res, next) => {
   }
 
   //Authorization. Delete can only creator.
-  if (place.creator.id !== req.userData.userData) {
+  if (place.creator.id !== req.userData.userId) {
     const error = new HttpError(
-      "You are not allowed to delete this place",
+      "You are not allowed to delete this place.",
       401
     );
     return next(error);
