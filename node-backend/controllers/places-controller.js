@@ -59,7 +59,7 @@ const createPlace = async (req, res, next) => {
     );
   }
 
-  const { title, description, address, creator } = req.body;
+  const { title, description, address } = req.body;
 
   let coordinates; //using google api midddleware address => coordinates
   try {
@@ -74,12 +74,12 @@ const createPlace = async (req, res, next) => {
     image: req.file.path,
     address,
     location: coordinates,
-    creator
+    creator: req.userData.userId
   });
 
   let user;
   try {
-    user = await User.findById(creator); //checking if user id already in db
+    user = await User.findById(req.userData.userId); //checking if user id already in db
   } catch (err) {
     const error = new HttpError("Creating place failed", 500);
     return next(error);
