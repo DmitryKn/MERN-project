@@ -1,13 +1,21 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, Suspense } from "react";
 
 import MainNavigation from "./Shared/Components/Navigation/MainNavigation";
-import Users from "./Users/Pages/Users";
-import UserPlaces from "./Places/Pages/UserPlaces";
-import NewPlace from "./Places/Pages/NewPlace";
-import UpdatePlace from "./Places/Pages/UpdatePlace";
-import Authentication from "./Users/Pages/Auth";
+//import Users from "./Users/Pages/Users";
+//import UserPlaces from "./Places/Pages/UserPlaces";
+//import NewPlace from "./Places/Pages/NewPlace";
+//import UpdatePlace from "./Places/Pages/UpdatePlace";
+//import Authentication from "./Users/Pages/Auth";
 import { AuthContext } from "./Shared/Context/auth-context";
 import { Route, Redirect, Switch } from "react-router-dom";
+import LoadingSpinner from "./Shared/Components/UIElements/LoadingSpinner";
+
+//lazy load content for routing + wrapping routes with <Suspense>
+const Users = React.lazy(() => import("./Users/Pages/Users"));
+const UserPlaces = React.lazy(() => import("./Places/Pages/UserPlaces"));
+const NewPlace = React.lazy(() => import("./Places/Pages/NewPlace"));
+const UpdatePlace = React.lazy(() => import("./Places/Pages/UpdatePlace"));
+const Authentication = React.lazy(() => import("./Users/Pages/Auth"));
 
 let logoutTimer;
 
@@ -102,7 +110,17 @@ const App = () => {
         }}
       >
         <MainNavigation />
-        <main>{routes}</main>
+        <main>
+          <Suspense
+            fallback={
+              <div className="center">
+                <LoadingSpinner />
+              </div>
+            }
+          >
+            {routes}
+          </Suspense>
+        </main>
       </AuthContext.Provider>
     </div>
   );
