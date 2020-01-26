@@ -18,4 +18,4 @@ in react-frontend folder:
 in node-backend folder:
 
 > "npm i"
-> "npm start".
+> "npm run dev".
